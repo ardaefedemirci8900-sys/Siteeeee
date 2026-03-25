@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marcas</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --text-color: #ffffff;
+            --accent-color: #cda434;
+            --card-bg: #111111;
+            --font-main: 'Poppins', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-main); background-color: var(--bg-color); color: var(--text-color); scroll-behavior: smooth; }
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+
+        header {
+            padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
+            position: fixed; width: 100%; top: 0; z-index: 1000; background: rgba(5, 5, 5, 0.9); border-bottom: 1px solid #222;
+        }
+
+        .logo { font-size: 26px; font-weight: 800; letter-spacing: 3px; color: var(--accent-color); }
+        nav ul { display: flex; gap: 25px; list-style: none; align-items: center; }
+        .btn-login-nav { padding: 8px 20px; border: 1px solid var(--accent-color); color: var(--accent-color); font-weight: 600; }
+
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center;
+        }
+
+        /* Giriş Paneli */
+        .login-card { background: #111; border: 1px solid #333; padding: 40px; width: 350px; text-align: center; position: relative; }
+        .login-card input { width: 100%; padding: 12px; margin-bottom: 15px; background: #000; border: 1px solid #222; color: #fff; }
+        .btn-submit { width: 100%; padding: 12px; background: var(--accent-color); border: none; font-weight: 700; cursor: pointer; color: #000; display: inline-block; }
+
+        /* Ürün Detay Paneli (YENİ) */
+        .product-detail-card {
+            background: #111; border: 1px solid var(--accent-color); padding: 30px; 
+            width: 90%; max-width: 450px; text-align: center; position: relative;
+        }
+        .close-modal-btn {
+            position: absolute; top: 10px; right: 15px; font-size: 24px; color: #aaa; 
+            background: none; border: none; cursor: pointer;
+        }
+        .close-modal-btn:hover { color: var(--accent-color); }
+
+        .hero {
+            height: 70vh; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; text-align: center; padding: 0 20px;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200') center/cover;
+            margin-top: 60px;
+        }
+
+        .catalog { padding: 80px 40px; }
+        .section-title { text-align: center; margin-bottom: 50px; font-size: 32px; letter-spacing: 2px; text-transform: uppercase; }
+        .section-title span { border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .item-card { background: var(--card-bg); padding: 15px; border: 1px solid #1a1a1a; transition: 0.3s; cursor: pointer; }
+        .item-card:hover { border-color: var(--accent-color); transform: scale(1.02); }
+
+        .img-box { width: 100%; height: 280px; background: #000; margin-bottom: 15px; }
+        .img-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        .item-info h3 { font-size: 16px; margin-bottom: 5px; color: var(--accent-color); }
+        .item-info p { color: #888; font-size: 13px; height: 35px; overflow: hidden; }
+        .price { font-weight: 700; font-size: 18px; display: block; margin-top: 10px; }
+
+        .contact { padding: 60px 40px; background: #080808; text-align: center; }
+        .contact-info { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; margin-top: 20px; }
+        .contact-box a:hover { color: var(--accent-color); }
+        
+        footer { padding: 30px; text-align: center; color: #444; font-size: 12px; }
+
+        @media (max-width: 768px) {
+            header { padding: 15px 20px; }
+            .grid { gap: 15px; }
+            .catalog { padding: 40px 15px; }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-card">
+            <h2>MARCAS PANEL</h2>
+            <input type="email" placeholder="E-Posta">
+            <input type="password" placeholder="Şifre">
+            <button class="btn-submit">GİRİŞ YAP</button>
+            <button onclick="toggleLogin()" style="margin-top:15px; color:#555; background:none; border:none; cursor:pointer;">Kapat</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="productModal">
+        <div class="product-detail-card">
+            <button class="close-modal-btn" onclick="closeProduct()">&#10005;</button>
+            <img id="detailImg" src="" alt="" style="width:100%; height:250px; object-fit:cover; margin-bottom:15px; border:1px solid #333;">
+            <h2 id="detailTitle" style="color:var(--accent-color); margin-bottom:10px; font-size:22px;"></h2>
+            <p id="detailDesc" style="font-size:13px; color:#ccc; margin-bottom:20px; line-height:1.6; text-align:justify;"></p>
+            <span id="detailPrice" style="font-size:24px; font-weight:700; color:var(--text-color); display:block; margin-bottom:20px;"></span>
+            
+            <a href="https://www.instagram.com/arda.efe0101?igsh=aW53aDJpeXh6amF0" target="_blank" class="btn-submit">INSTAGRAM'DAN SİPARİŞ VER</a>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo">MARCAS</div>
+        <nav>
+            <ul>
+                <li><a href="#katalog">Koleksiyon</a></li>
+                <li><a href="javascript:void(0)" onclick="toggleLogin()" class="btn-login-nav">Giriş Yap</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>MARCAS 2026</h1>
+        <p>Arda Efe Demirci Tasarımıyla 13 Özel Parçadan Oluşan Dev Koleksiyon.</p>
+    </section>
+
+    <section class="catalog" id="katalog">
+        <h2 class="section-title"><span>Yeni Sezon Vitrini</span></h2>
+        <div class="grid" id="product-list">
+            </div>
+    </section>
+
+    <section class="contact">
+        <div class="contact-info">
+            <div class="contact-box"><h4>E-POSTA</h4><p><a href="mailto:ardaefedemirci8900@gmail.com">ardaefe@gmail.com</a></p></div>
+            <div class="contact-box"><h4>TELEFON</h4><p><a href="tel:05554443322">05554443322</a></p></div>
+            <div class="contact-box"><h4>INSTAGRAM</h4><p><a href="https://www.instagram.com/arda.efe0101?igsh=aW53aDJpeXh6amF0" target="_blank">@arda.efe0101</a></p></div>
+        </div>
+    </section>
+
+    <footer>
+        <p>MARCAS ELITE FOOTWEAR &copy; 2026 | Design by Arda Efe Demirci</p>
+    </footer>
+
+    <script>
+        function toggleLogin() {
+            const modal = document.getElementById('loginModal');
+            modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        // Ürün Detay Penceresini Kapatma Fonksiyonu
+        function closeProduct() {
+            document.getElementById('productModal').style.display = 'none';
+        }
+
+        const products = [
+            { name: "Marcas Alpha S1", desc: "Koleksiyonun en iddialı parçası.", price: "4.800 TL", img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=600" },
+            { name: "Marcas Gold Edition", desc: "Altın detaylı özel işçilik.", price: "6.500 TL", img: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=600" },
+            { name: "Marcas Urban Ghost", desc: "Sokak stilinin en hafif hali.", price: "3.200 TL", img: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?q=80&w=600" },
+            { name: "Marcas Executive", desc: "Klasik ve modernin buluşması.", price: "5.100 TL", img: "https://images.unsplash.com/photo-1656944227421-416b1d2186c9?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c2hvZXMlMjBuaWtlfGVufDB8fDB8fHww" },
+            { name: "Marcas Sport Pro", desc: "Yüksek performans ve konfor.", price: "3.900 TL", img: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?q=80&w=600" },
+            { name: "Marcas Desert Storm", desc: "Zorlu şartlar için elit tasarım.", price: "4.300 TL", img: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=600" },
+            { name: "Marcas Midnight", desc: "Gece şıklığı için derin siyah.", price: "4.600 TL", img: "https://images.unsplash.com/photo-1514989940723-e8e51635b782?q=80&w=600" },
+            { name: "Marcas Red Line", desc: "Cesur adımlar için kırmızı detay.", price: "3.750 TL", img: "https://images.unsplash.com/photo-1543508282-6319a3e2621f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8c2hvZXN8ZW58MHx8MHx8fDA%3D" },
+            { name: "Marcas Ocean Blue", desc: "Ferah ve dinamik mavi seri.", price: "4.100 TL", img: "https://images.unsplash.com/photo-1515955656352-a1fa3ffcd111?q=80&w=600" },
+            { name: "Marcas Leather King", desc: "Hakiki İtalyan deri dokunuşu.", price: "7.200 TL", img: "https://images.unsplash.com/photo-1449505278894-297fdb3edbc1?q=80&w=600" },
+            { name: "Marcas Stealth", desc: "Fark edilmeyen ama hissedilen güç.", price: "4.400 TL", img: "https://images.unsplash.com/photo-1539185441755-769473a23570?q=80&w=600" },
+            { name: "Marcas Aero", desc: "Sanki bulutların üzerinde yürüyor gibi.", price: "3.550 TL", img: "https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?q=80&w=600" },
+            { name: "Marcas Legacy", desc: "Geleceğin mirasını bugünden taşıyın.", price: "5.800 TL", img: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?q=80&w=600" }
+        ];
+
+        // Ürün Detay Penceresini Açma ve İçini Doldurma Fonksiyonu
+        function openProduct(index) {
+            const p = products[index];
+            document.getElementById('detailImg').src = p.img;
+            document.getElementById('detailTitle').innerText = p.name;
+            document.getElementById('detailPrice').innerText = p.price;
+            
+            // Rastgele, elit ve uzun ürün açıklaması oluşturucu
+            const uzunAciklama = p.desc + " Bu özel tasarım parça, birinci sınıf lüks malzemeler ve ileri teknoloji kullanılarak el işçiliği ile üretilmiştir. Ergonomik taban yapısı sayesinde gün boyu maksimum konfor sağlarken, stilinizden ödün vermez. Marcas kalitesiyle adımlarınıza güç ve zarafet katın. Sınırlı stoklarla sunulan bu model için hemen sipariş verin.";
+            
+            document.getElementById('detailDesc').innerText = uzunAciklama;
+            
+            // Modalı görünür yap
+            document.getElementById('productModal').style.display = 'flex';
+        }
+
+        const list = document.getElementById('product-list');
+        products.forEach((p, index) => {
+            // onclick="openProduct(index)" eklendi, böylece karta tıklanabiliyor.
+            list.innerHTML += `
+                <div class="item-card" onclick="openProduct(${index})">
+                    <div class="img-box"><img src="${p.img}" alt="${p.name}"></div>
+                    <div class="item-info">
+                        <h3>${p.name}</h3>
+                        <p>${p.desc}</p>
+                        <span class="price">${p.price}</span>
+                    </div>
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>
